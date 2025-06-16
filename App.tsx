@@ -1,11 +1,6 @@
 import React from 'react';
-import { SafeAreaView } from 'react-native';
-import Button from './src/components/Button';
+import EditorScreen from './src/screens/EditorScreen';
 
 export default function App() {
-  return (
-    <SafeAreaView>
-      <Button label="Test Button" onPress={() => console.log('Pressed')} />
-    </SafeAreaView>
-  );
+  return <EditorScreen />;
 }

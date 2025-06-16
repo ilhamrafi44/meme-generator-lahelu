@@ -29,4 +29,12 @@ module.exports = {
       },
     },
   },
+  overrides: [
+    {
+      files: ['metro.config.js'],
+      rules: {
+        '@typescript-eslint/no-require-imports': 'off',
+      },
+    },
+  ],
 };
