@@ -6,7 +6,7 @@ import MemeCanvas from '../components/MemeCanvas';
 import DraggableText from '../components/DraggableText';
 import DraggableImage from '../components/DraggableImage';
 import memeTemplates from '../utils/templates';
-import { styles } from '../styles/editorScreenStyles';
+import styles from '../styles/editorScreenStyles';
 
 type TextOverlay = {
   id: string;

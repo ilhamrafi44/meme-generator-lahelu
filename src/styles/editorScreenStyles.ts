@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000', // makes meme pop more
@@ -12,3 +12,5 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
 });
+
+export default styles;

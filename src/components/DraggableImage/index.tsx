@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Image } from 'react-native';
+import { Image, Text, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView, GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
-import { styles } from './styles';
+import styles from './styles';
 import TransformDots from './TransformDots';
 import RotateHandle from './RotateHandle';
 import HintBox from './HintBox';
@@ -70,6 +70,9 @@ export default function DraggableImage({ uri, onRemove }: Props) {
 
           <HintBox show={showHint} />
         </Animated.View>
+        <TouchableOpacity style={styles.deleteBtn} onPress={onRemove}>
+          <Text style={styles.deleteText}>✖</Text>
+        </TouchableOpacity>
       </GestureDetector>
     </GestureHandlerRootView>
   );

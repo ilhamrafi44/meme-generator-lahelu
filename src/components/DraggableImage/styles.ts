@@ -11,7 +11,22 @@ const dotBase = {
   zIndex: 99,
 };
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
+  deleteBtn: {
+    position: 'absolute',
+    top: -16,
+    right: -16,
+    backgroundColor: 'red',
+    borderRadius: 12,
+    padding: 4,
+    zIndex: 10,
+  },
+  deleteText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+
   wrapper: {
     position: 'absolute',
     alignItems: 'center',
@@ -54,3 +69,5 @@ export const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 });
+
+export default styles;

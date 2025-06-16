@@ -13,7 +13,7 @@ const dotBase = {
   zIndex: 99,
 };
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   wrapper: {
     position: 'absolute',
     alignItems: 'center',
@@ -129,3 +129,5 @@ export const styles = StyleSheet.create({
   middleLeft: { ...dotBase, top: '50%', left: -8, marginTop: -dotSize / 2 },
   middleRight: { ...dotBase, top: '50%', right: -8, marginTop: -dotSize / 2 },
 });
+
+export default styles;

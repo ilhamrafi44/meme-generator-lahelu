@@ -49,7 +49,7 @@ export default function MemeCanvas({ backgroundUri, children }: MemeCanvasProps)
     <GestureHandlerRootView style={styles.root}>
       <GestureDetector gesture={composedGesture}>
         <Animated.View style={[styles.canvas, canvasStyle]}>
-          {/* <Image source={{ uri: backgroundUri }} style={styles.background} resizeMode="contain" /> */}
+          <Image source={{ uri: backgroundUri }} style={styles.background} resizeMode="contain" />
           {children}
         </Animated.View>
       </GestureDetector>

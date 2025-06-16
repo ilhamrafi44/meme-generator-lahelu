@@ -1,11 +1,11 @@
 // components/DraggableText/TransformDots.tsx
 import React from 'react';
-import { GestureDetector } from 'react-native-gesture-handler';
+import { GestureDetector, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { styles } from './styles';
 
 type Props = {
-  makeStretchGesture: (axis: 'x' | 'y' | 'both') => any;
+  makeStretchGesture: (axis: 'x' | 'y' | 'both') => PanGestureHandlerGestureEvent;
 };
 
 export default function TransformDots({ makeStretchGesture }: Props) {
