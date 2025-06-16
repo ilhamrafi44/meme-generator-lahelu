@@ -1,0 +1,303 @@
+import React, { useState } from 'react';
+import {
+  Text,
+  TextInput,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Platform,
+  KeyboardAvoidingView,
+} from 'react-native';
+import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+
+type DraggableTextProps = {
+  id: string;
+  text: string;
+  onChangeText?: (text: string) => void;
+  onRemove?: (id: string) => void;
+};
+
+export default function DraggableText({ id, text, onChangeText, onRemove }: DraggableTextProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempText, setTempText] = useState(text);
+  const [showHint, setShowHint] = useState(false);
+
+  const offsetX = useSharedValue(0);
+  const offsetY = useSharedValue(0);
+  const scaleX = useSharedValue(1);
+  const scaleY = useSharedValue(1);
+  const rotation = useSharedValue(0);
+
+  const panGesture = Gesture.Pan().onChange(e => {
+    offsetX.value += e.changeX;
+    offsetY.value += e.changeY;
+  });
+
+  const rotateGesture = Gesture.Pan().onChange(e => {
+    rotation.value += e.translationX * 0.005;
+  });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: withSpring(offsetX.value) },
+      { translateY: withSpring(offsetY.value) },
+      { scaleX: withSpring(scaleX.value) },
+      { scaleY: withSpring(scaleY.value) },
+      { rotateZ: `${rotation.value}rad` },
+    ],
+  }));
+
+  const makeStretchGesture = (axis: 'x' | 'y' | 'both') =>
+    Gesture.Pan().onChange(e => {
+      if (axis === 'x') {
+        const deltaX = e.translationX * 0.01;
+        scaleX.value = Math.max(0.3, scaleX.value + deltaX);
+      } else if (axis === 'y') {
+        const deltaY = e.translationY * 0.01;
+        scaleY.value = Math.max(0.3, scaleY.value + deltaY);
+      } else {
+        const delta = (e.translationX + e.translationY) * 0.005;
+        scaleX.value = Math.max(0.3, scaleX.value + delta);
+        scaleY.value = Math.max(0.3, scaleY.value + delta);
+      }
+    });
+
+  const handleConfirm = () => {
+    onChangeText?.(tempText);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setTempText(text);
+    setIsEditing(false);
+  };
+
+  const handleShowHint = () => {
+    setShowHint(true);
+    setTimeout(() => setShowHint(false), 3000);
+  };
+
+  return (
+    <GestureHandlerRootView>
+      <GestureDetector gesture={panGesture}>
+        <Animated.View style={[styles.wrapper, animatedStyle]}>
+          <View style={[styles.box, !isEditing && styles.boxTransparent]}>
+            {isEditing && (
+              <GestureDetector gesture={rotateGesture}>
+                <Animated.View style={styles.rotateHandle}>
+                  <Text style={styles.rotateIcon}>↻</Text>
+                </Animated.View>
+              </GestureDetector>
+            )}
+
+            {!isEditing ? (
+              <TouchableOpacity
+                onLongPress={() => {
+                  setIsEditing(true);
+                  handleShowHint();
+                }}
+              >
+                <Text style={styles.text}>{text || 'Empty text'}</Text>
+              </TouchableOpacity>
+            ) : (
+              <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                style={styles.editor}
+              >
+                <TextInput
+                  value={tempText}
+                  onChangeText={setTempText}
+                  autoFocus
+                  multiline
+                  style={styles.textInput}
+                />
+                <View style={styles.actions}>
+                  <TouchableOpacity
+                    style={[styles.actionBtn, styles.confirm]}
+                    onPress={handleConfirm}
+                  >
+                    <Text style={styles.actionText}>✔</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.actionBtn, styles.cancel]}
+                    onPress={handleCancel}
+                  >
+                    <Text style={styles.actionText}>✖</Text>
+                  </TouchableOpacity>
+                </View>
+              </KeyboardAvoidingView>
+            )}
+
+            {showHint && (
+              <View style={styles.hintBox}>
+                <Text style={styles.hintText}>
+                  Drag corners to scale, edges to stretch, ↻ to rotate
+                </Text>
+              </View>
+            )}
+
+            {/* Editing Controls */}
+            {isEditing && (
+              <>
+                {/* Corners */}
+                <GestureDetector gesture={makeStretchGesture('both')}>
+                  <Animated.View style={[styles.dot, styles.topLeft]} />
+                </GestureDetector>
+                <GestureDetector gesture={makeStretchGesture('both')}>
+                  <Animated.View style={[styles.dot, styles.topRight]} />
+                </GestureDetector>
+                <GestureDetector gesture={makeStretchGesture('both')}>
+                  <Animated.View style={[styles.dot, styles.bottomLeft]} />
+                </GestureDetector>
+                <GestureDetector gesture={makeStretchGesture('both')}>
+                  <Animated.View style={[styles.dot, styles.bottomRight]} />
+                </GestureDetector>
+
+                {/* Edges */}
+                <GestureDetector gesture={makeStretchGesture('y')}>
+                  <Animated.View style={[styles.dot, styles.topCenter]} />
+                </GestureDetector>
+                <GestureDetector gesture={makeStretchGesture('y')}>
+                  <Animated.View style={[styles.dot, styles.bottomCenter]} />
+                </GestureDetector>
+                <GestureDetector gesture={makeStretchGesture('x')}>
+                  <Animated.View style={[styles.dot, styles.middleLeft]} />
+                </GestureDetector>
+                <GestureDetector gesture={makeStretchGesture('x')}>
+                  <Animated.View style={[styles.dot, styles.middleRight]} />
+                </GestureDetector>
+              </>
+            )}
+          </View>
+
+          <TouchableOpacity style={styles.deleteBtn} onPress={() => onRemove?.(id)}>
+            <Text style={styles.deleteText}>✖</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </GestureDetector>
+    </GestureHandlerRootView>
+  );
+}
+
+const dotBase = {
+  position: 'absolute' as const,
+  width: 14,
+  height: 14,
+  borderRadius: 7,
+  backgroundColor: '#0af',
+  borderWidth: 1,
+  borderColor: '#fff',
+  zIndex: 99,
+};
+
+const styles = StyleSheet.create({
+  wrapper: {
+    position: 'absolute',
+    alignItems: 'center',
+  },
+  box: {
+    borderWidth: 2,
+    borderColor: '#00f',
+    borderStyle: 'dashed',
+    borderRadius: 8,
+    padding: 8,
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  boxTransparent: {
+    borderWidth: 0,
+    backgroundColor: 'transparent',
+  },
+  text: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
+    textShadowColor: 'black',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
+  },
+  editor: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 10,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    minWidth: 200,
+    maxWidth: 300,
+  },
+  textInput: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#000',
+    textAlign: 'center',
+  },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  actionBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  confirm: { backgroundColor: 'green' },
+  cancel: { backgroundColor: 'gray' },
+  actionText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  deleteBtn: {
+    position: 'absolute',
+    top: -16,
+    right: -16,
+    backgroundColor: 'red',
+    borderRadius: 12,
+    padding: 4,
+    zIndex: 10,
+  },
+  deleteText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  hintBox: {
+    marginTop: 6,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  hintText: {
+    color: 'white',
+    fontSize: 12,
+    fontStyle: 'italic',
+  },
+  rotateHandle: {
+    position: 'absolute',
+    top: -28,
+    alignSelf: 'center',
+    padding: 6,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  rotateIcon: {
+    fontSize: 18,
+    color: '#333',
+  },
+  dot: dotBase,
+  topLeft: { ...dotBase, top: -8, left: -8 },
+  topRight: { ...dotBase, top: -8, right: -8 },
+  bottomLeft: { ...dotBase, bottom: -8, left: -8 },
+  bottomRight: { ...dotBase, bottom: -8, right: -8 },
+  topCenter: { ...dotBase, top: -8, left: '50%', marginLeft: -7 },
+  bottomCenter: { ...dotBase, bottom: -8, left: '50%', marginLeft: -7 },
+  middleLeft: { ...dotBase, top: '50%', left: -8, marginTop: -7 },
+  middleRight: { ...dotBase, top: '50%', right: -8, marginTop: -7 },
+});
