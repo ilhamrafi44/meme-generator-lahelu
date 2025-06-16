@@ -10,6 +10,7 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint', 'prettier'],
   rules: {
+    'react/require-default-props': 'off',
     'react/jsx-filename-extension': [1, { extensions: ['.tsx'] }],
     'import/extensions': ['error', 'never'],
     'prettier/prettier': ['error'],

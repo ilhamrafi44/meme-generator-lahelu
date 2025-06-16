@@ -5,7 +5,7 @@ import DraggableText from '../components/DraggableText';
 import memeTemplates from '../utils/templates';
 
 export default function EditorScreen() {
-  const [selectedTemplate, setSelectedTemplate] = useState<string>(memeTemplates[0]);
+  const [selectedTemplate, _setSelectedTemplate] = useState<string>(memeTemplates[0]);
   const [texts, setTexts] = useState<string[]>(['']);
 
   const handleAddText = () => setTexts([...texts, '']);
@@ -14,12 +14,22 @@ export default function EditorScreen() {
     updated[index] = newText;
     setTexts(updated);
   };
-
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    actions: {
+      padding: 16,
+      backgroundColor: '#eee',
+      flexDirection: 'row',
+      justifyContent: 'center',
+    },
+  });
   return (
     <SafeAreaView style={styles.container}>
       <MemeCanvas backgroundUri={selectedTemplate}>
         {texts.map((text, i) => (
-          <DraggableText key={i} text={text} onChangeText={t => handleChangeText(i, t)} />
+          <DraggableText key={text + 1} text={text} onChangeText={t => handleChangeText(i, t)} />
         ))}
       </MemeCanvas>
 
@@ -29,15 +39,3 @@ export default function EditorScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  actions: {
-    padding: 16,
-    backgroundColor: '#eee',
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-});
