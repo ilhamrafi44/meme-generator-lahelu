@@ -1,58 +1,53 @@
-import React from 'react';
-import { StyleSheet, Image } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { GestureHandlerRootView, GestureDetector, Gesture } from 'react-native-gesture-handler';
+import React, { useState } from 'react';
+import { Image, StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import CanvasTransformer, { TransformState } from './CanvasTransformer';
 
 type MemeCanvasProps = {
-  backgroundUri: string;
+  backgroundUri?: string;
   children?: React.ReactNode;
 };
 
 export default function MemeCanvas({ backgroundUri, children }: MemeCanvasProps) {
-  const scale = useSharedValue(1);
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
+  const [_transform, setTransform] = useState<TransformState | null>(null);
 
-  const panGesture = Gesture.Pan().onChange(e => {
-    translateX.value += e.changeX;
-    translateY.value += e.changeY;
-  });
+  const handleAccept = (newState: TransformState) => {
+    setTransform(newState); // save latest state
+    console.log('✅ Canvas Saved:', newState);
+  };
 
-  const pinchGesture = Gesture.Pinch().onChange(e => {
-    scale.value = e.scale;
-  });
+  const handleDuplicate = () => {
+    console.log('📄 Duplicate clicked (not implemented)');
+  };
 
-  const composedGesture = Gesture.Simultaneous(panGesture, pinchGesture);
-
-  const canvasStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: withTiming(scale.value) },
-      { translateX: withTiming(translateX.value) },
-      { translateY: withTiming(translateY.value) },
-    ],
-  }));
+  const handleRemove = () => {
+    console.log('❌ Canvas removed (not implemented)');
+  };
   const styles = StyleSheet.create({
     root: {
       flex: 1,
-    },
-    canvas: {
-      flex: 1,
+      backgroundColor: '#fff',
       alignItems: 'center',
       justifyContent: 'center',
     },
     background: {
-      ...StyleSheet.absoluteFillObject,
-      zIndex: 0,
+      width: 300,
+      height: 300,
+      position: 'absolute',
     },
   });
   return (
     <GestureHandlerRootView style={styles.root}>
-      <GestureDetector gesture={composedGesture}>
-        <Animated.View style={[styles.canvas, canvasStyle]}>
+      <CanvasTransformer
+        onAccept={handleAccept}
+        onRemove={handleRemove}
+        onDuplicate={handleDuplicate}
+      >
+        {backgroundUri && (
           <Image source={{ uri: backgroundUri }} style={styles.background} resizeMode="contain" />
-          {children}
-        </Animated.View>
-      </GestureDetector>
+        )}
+        {children}
+      </CanvasTransformer>
     </GestureHandlerRootView>
   );
 }

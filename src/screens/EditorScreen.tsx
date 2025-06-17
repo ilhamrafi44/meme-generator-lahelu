@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, Button, SafeAreaView } from 'react-native';
+import { View, SafeAreaView, TouchableOpacity, Text } from 'react-native';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
+
 import MemeCanvas from '../components/MemeCanvas';
 import DraggableText from '../components/DraggableText';
 import DraggableImage from '../components/DraggableImage';
+import TemplateSelector from '../components/TemplateSelector';
 import memeTemplates from '../utils/templates';
 import styles from '../styles/editorScreenStyles';
 
@@ -14,7 +16,8 @@ type TextOverlay = {
 };
 
 export default function EditorScreen() {
-  const [selectedTemplate] = useState<string>(memeTemplates[0]);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>(memeTemplates[0]);
+
   const [texts, setTexts] = useState<TextOverlay[]>([]);
   const [images, setImages] = useState<{ id: string; uri: string }[]>([]);
 
@@ -45,25 +48,36 @@ export default function EditorScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <MemeCanvas backgroundUri={selectedTemplate}>
-        {texts.map(t => (
-          <DraggableText
-            key={t.id}
-            id={t.id}
-            text={t.value}
-            onChangeText={val => handleChangeText(t.id, val)}
-            onRemove={handleRemoveText}
-          />
-        ))}
+      <TemplateSelector
+        templates={memeTemplates}
+        selected={selectedTemplate}
+        onSelect={setSelectedTemplate}
+      />
 
-        {images.map(img => (
-          <DraggableImage key={img.id} uri={img.uri} onRemove={() => handleRemoveImage(img.id)} />
-        ))}
-      </MemeCanvas>
+      <View style={styles.canvasWrapper}>
+        <MemeCanvas backgroundUri={selectedTemplate}>
+          {texts.map(t => (
+            <DraggableText
+              key={t.id}
+              id={t.id}
+              text={t.value}
+              onChangeText={val => handleChangeText(t.id, val)}
+              onRemove={handleRemoveText}
+            />
+          ))}
+          {images.map(img => (
+            <DraggableImage key={img.id} uri={img.uri} onRemove={() => handleRemoveImage(img.id)} />
+          ))}
+        </MemeCanvas>
+      </View>
 
       <View style={styles.actions}>
-        <Button title="Add Text" onPress={handleAddText} />
-        <Button title="Add Image" onPress={handleAddImage} />
+        <TouchableOpacity style={styles.actionBtn} onPress={handleAddText}>
+          <Text style={styles.actionText}>➕ Add Text</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionBtn} onPress={handleAddImage}>
+          <Text style={styles.actionText}>🖼️ Add Image</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

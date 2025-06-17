@@ -2,7 +2,7 @@
 import React from 'react';
 import { GestureDetector, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
-import { styles } from './styles';
+import styles from './styles';
 
 type Props = {
   makeStretchGesture: (axis: 'x' | 'y' | 'both') => PanGestureHandlerGestureEvent;

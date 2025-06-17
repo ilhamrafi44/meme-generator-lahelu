@@ -3,7 +3,7 @@ import React from 'react';
 import { Text } from 'react-native';
 import { GestureDetector, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
-import { styles } from './styles';
+import styles from './styles';
 
 export default function RotateHandle({ gesture }: PanGestureHandlerGestureEvent) {
   return (

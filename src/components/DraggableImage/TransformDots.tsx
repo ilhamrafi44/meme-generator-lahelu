@@ -1,7 +1,7 @@
 import React from 'react';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
-import { styles } from './styles';
+import styles from './styles';
 
 export default function TransformDots({
   makeStretchGesture,

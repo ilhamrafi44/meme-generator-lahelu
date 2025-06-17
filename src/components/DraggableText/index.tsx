@@ -8,7 +8,7 @@ import TextEditor from './TextEditor';
 import TransformDots from './TransformDots';
 import RotateHandle from './RotateHandle';
 import HintOverlay from './HintOverlay';
-import { styles } from './styles';
+import styles from './styles';
 
 type DraggableTextProps = {
   id: string;
